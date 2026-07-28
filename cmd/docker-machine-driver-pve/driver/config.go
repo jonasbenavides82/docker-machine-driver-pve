@@ -246,27 +246,27 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Usage:  "Proxmox VE Resource Pool name (alias)",
 			Value:  "",
 		},
-		mcnflag.IntFlag{
+		mcnflag.StringFlag{
 			Name:   flagTemplateID,
 			EnvVar: flagEnvVarFromFlagName(flagTemplateID),
 			Usage:  "ID of the Proxmox VE template",
-			Value:  0,
+			Value:  "",
 		},
-		mcnflag.IntFlag{
+		mcnflag.StringFlag{
 			Name:   "template",
 			Usage:  "ID of the Proxmox VE template (alias)",
-			Value:  0,
+			Value:  "",
 		},
-		mcnflag.IntFlag{
+		mcnflag.StringFlag{
 			Name:   "pve-template-id",
 			EnvVar: "PVE_TEMPLATE_ID",
 			Usage:  "ID of the Proxmox VE template (alias)",
-			Value:  0,
+			Value:  "",
 		},
-		mcnflag.IntFlag{
+		mcnflag.StringFlag{
 			Name:   "template-id",
 			Usage:  "ID of the Proxmox VE template (alias)",
-			Value:  0,
+			Value:  "",
 		},
 		mcnflag.StringFlag{
 			Name:   flagISODevice,
@@ -313,60 +313,60 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Usage:  "SSH user (alias)",
 			Value:  defaultSSHUser,
 		},
-		mcnflag.IntFlag{
+		mcnflag.StringFlag{
 			Name:   flagSSHPort,
 			EnvVar: flagEnvVarFromFlagName(flagSSHPort),
 			Usage:  fmt.Sprintf("SSH port, defaults to '%d'", defaultSSHPort),
-			Value:  defaultSSHPort,
+			Value:  "22",
 		},
-		mcnflag.IntFlag{
+		mcnflag.StringFlag{
 			Name:   "ssh-port",
 			Usage:  "SSH port (alias)",
-			Value:  defaultSSHPort,
+			Value:  "22",
 		},
-		mcnflag.IntFlag{
+		mcnflag.StringFlag{
 			Name:   flagProcessorSockets,
 			EnvVar: flagEnvVarFromFlagName(flagProcessorSockets),
 			Usage:  "Processor sockets count for the VM",
-			Value:  1,
+			Value:  "1",
 		},
-		mcnflag.IntFlag{
+		mcnflag.StringFlag{
 			Name:   "processor-sockets",
 			Usage:  "Processor sockets count (alias)",
-			Value:  1,
+			Value:  "1",
 		},
-		mcnflag.IntFlag{
+		mcnflag.StringFlag{
 			Name:   flagProcessorCores,
 			EnvVar: flagEnvVarFromFlagName(flagProcessorCores),
 			Usage:  "Processor cores count for the VM",
-			Value:  1,
+			Value:  "1",
 		},
-		mcnflag.IntFlag{
+		mcnflag.StringFlag{
 			Name:   "processor-cores",
 			Usage:  "Processor cores count (alias)",
-			Value:  1,
+			Value:  "1",
 		},
-		mcnflag.IntFlag{
+		mcnflag.StringFlag{
 			Name:   flagMemory,
 			EnvVar: flagEnvVarFromFlagName(flagMemory),
 			Usage:  "Memory size in MiB for the VM",
-			Value:  2048,
+			Value:  "2048",
 		},
-		mcnflag.IntFlag{
+		mcnflag.StringFlag{
 			Name:   "memory",
 			Usage:  "Memory size in MiB (alias)",
-			Value:  2048,
+			Value:  "2048",
 		},
-		mcnflag.IntFlag{
+		mcnflag.StringFlag{
 			Name:   flagMemoryBalloon,
 			EnvVar: flagEnvVarFromFlagName(flagMemoryBalloon),
 			Usage:  "Minimum memory in MiB for memory ballooning (0 to disable)",
-			Value:  0,
+			Value:  "0",
 		},
-		mcnflag.IntFlag{
+		mcnflag.StringFlag{
 			Name:   "memory-balloon",
 			Usage:  "Minimum memory in MiB (alias)",
-			Value:  0,
+			Value:  "0",
 		},
 		mcnflag.BoolFlag{
 			Name:   flagFullClone,
@@ -405,16 +405,16 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Usage:  "Network bridge interface (alias)",
 			Value:  "",
 		},
-		mcnflag.IntFlag{
+		mcnflag.StringFlag{
 			Name:   flagVLAN,
 			EnvVar: flagEnvVarFromFlagName(flagVLAN),
 			Usage:  "Network VLAN tag number",
-			Value:  0,
+			Value:  "0",
 		},
-		mcnflag.IntFlag{
+		mcnflag.StringFlag{
 			Name:   "vlan",
 			Usage:  "Network VLAN tag number (alias)",
-			Value:  0,
+			Value:  "0",
 		},
 		mcnflag.StringFlag{
 			Name:   flagCIPassword,
