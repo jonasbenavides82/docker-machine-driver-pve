@@ -131,15 +131,29 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Usage:  "Proxmox VE URL (e.g. 'https://<PROXMOX VE ADDRESS>:8006')",
 			Value:  "",
 		},
+		mcnflag.StringFlag{
+			Name:   "url",
+			Usage:  "Proxmox VE URL (alias)",
+			Value:  "",
+		},
 		mcnflag.BoolFlag{
 			Name:   flagInsecureTLS,
 			EnvVar: flagEnvVarFromFlagName(flagInsecureTLS),
 			Usage:  "Disables Proxmox VE TLS certificate verification",
 		},
+		mcnflag.BoolFlag{
+			Name:   "insecure-tls",
+			Usage:  "Disables Proxmox VE TLS certificate verification (alias)",
+		},
 		mcnflag.StringFlag{
 			Name:   flagTokenID,
 			EnvVar: flagEnvVarFromFlagName(flagTokenID),
 			Usage:  "Proxmox VE API Token ID (e.g. 'root@pam!rancher')",
+			Value:  "",
+		},
+		mcnflag.StringFlag{
+			Name:   "token-id",
+			Usage:  "Proxmox VE API Token ID (alias)",
 			Value:  "",
 		},
 		mcnflag.StringFlag{
@@ -155,6 +169,11 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Value:  "",
 		},
 		mcnflag.StringFlag{
+			Name:   "token-secret",
+			Usage:  "Proxmox VE API Token secret (alias)",
+			Value:  "",
+		},
+		mcnflag.StringFlag{
 			Name:   "pve-tokensecret",
 			EnvVar: "PVE_TOKENSECRET",
 			Usage:  "Proxmox VE API Token secret (alias)",
@@ -167,9 +186,19 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Value:  "",
 		},
 		mcnflag.StringFlag{
+			Name:   "username",
+			Usage:  "Proxmox VE Username (alias)",
+			Value:  "",
+		},
+		mcnflag.StringFlag{
 			Name:   flagPassword,
 			EnvVar: flagEnvVarFromFlagName(flagPassword),
 			Usage:  "Proxmox VE Password (legacy auth fallback)",
+			Value:  "",
+		},
+		mcnflag.StringFlag{
+			Name:   "password",
+			Usage:  "Proxmox VE Password (alias)",
 			Value:  "",
 		},
 		mcnflag.StringFlag{
@@ -179,15 +208,30 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Value:  "",
 		},
 		mcnflag.StringFlag{
+			Name:   "realm",
+			Usage:  "Proxmox VE Auth Realm (alias)",
+			Value:  "",
+		},
+		mcnflag.StringFlag{
 			Name:   flagNode,
 			EnvVar: flagEnvVarFromFlagName(flagNode),
 			Usage:  "Proxmox VE Node name to host the VM (optional)",
 			Value:  "",
 		},
 		mcnflag.StringFlag{
+			Name:   "node",
+			Usage:  "Proxmox VE Node name (alias)",
+			Value:  "",
+		},
+		mcnflag.StringFlag{
 			Name:   flagResourcePool,
 			EnvVar: flagEnvVarFromFlagName(flagResourcePool),
 			Usage:  "Proxmox VE Resource Pool name",
+			Value:  "",
+		},
+		mcnflag.StringFlag{
+			Name:   "resource-pool",
+			Usage:  "Proxmox VE Resource Pool name (alias)",
 			Value:  "",
 		},
 		mcnflag.StringFlag{
@@ -209,8 +253,18 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Value:  0,
 		},
 		mcnflag.IntFlag{
+			Name:   "template",
+			Usage:  "ID of the Proxmox VE template (alias)",
+			Value:  0,
+		},
+		mcnflag.IntFlag{
 			Name:   "pve-template-id",
 			EnvVar: "PVE_TEMPLATE_ID",
+			Usage:  "ID of the Proxmox VE template (alias)",
+			Value:  0,
+		},
+		mcnflag.IntFlag{
+			Name:   "template-id",
 			Usage:  "ID of the Proxmox VE template (alias)",
 			Value:  0,
 		},
@@ -218,6 +272,11 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Name:   flagISODevice,
 			EnvVar: flagEnvVarFromFlagName(flagISODevice),
 			Usage:  "Bus/Device of CD/DVD Drive for cloud-init ISO (e.g. 'scsi1')",
+			Value:  "scsi1",
+		},
+		mcnflag.StringFlag{
+			Name:   "iso-device",
+			Usage:  "Bus/Device of CD/DVD Drive for cloud-init ISO (alias)",
 			Value:  "scsi1",
 		},
 		mcnflag.StringFlag{
@@ -233,6 +292,11 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Value:  "net0",
 		},
 		mcnflag.StringFlag{
+			Name:   "network-interface",
+			Usage:  "Bus/Device of network interface (alias)",
+			Value:  "net0",
+		},
+		mcnflag.StringFlag{
 			Name:   "pve-networkinterface",
 			EnvVar: "PVE_NETWORKINTERFACE",
 			Usage:  "Bus/Device of network interface (alias)",
@@ -244,10 +308,20 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Usage:  fmt.Sprintf("SSH user created via cloud-init, defaults to '%s'", defaultSSHUser),
 			Value:  defaultSSHUser,
 		},
+		mcnflag.StringFlag{
+			Name:   "ssh-user",
+			Usage:  "SSH user (alias)",
+			Value:  defaultSSHUser,
+		},
 		mcnflag.IntFlag{
 			Name:   flagSSHPort,
 			EnvVar: flagEnvVarFromFlagName(flagSSHPort),
 			Usage:  fmt.Sprintf("SSH port, defaults to '%d'", defaultSSHPort),
+			Value:  defaultSSHPort,
+		},
+		mcnflag.IntFlag{
+			Name:   "ssh-port",
+			Usage:  "SSH port (alias)",
 			Value:  defaultSSHPort,
 		},
 		mcnflag.IntFlag{
@@ -257,9 +331,19 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Value:  1,
 		},
 		mcnflag.IntFlag{
+			Name:   "processor-sockets",
+			Usage:  "Processor sockets count (alias)",
+			Value:  1,
+		},
+		mcnflag.IntFlag{
 			Name:   flagProcessorCores,
 			EnvVar: flagEnvVarFromFlagName(flagProcessorCores),
 			Usage:  "Processor cores count for the VM",
+			Value:  1,
+		},
+		mcnflag.IntFlag{
+			Name:   "processor-cores",
+			Usage:  "Processor cores count (alias)",
 			Value:  1,
 		},
 		mcnflag.IntFlag{
@@ -269,9 +353,19 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Value:  2048,
 		},
 		mcnflag.IntFlag{
+			Name:   "memory",
+			Usage:  "Memory size in MiB (alias)",
+			Value:  2048,
+		},
+		mcnflag.IntFlag{
 			Name:   flagMemoryBalloon,
 			EnvVar: flagEnvVarFromFlagName(flagMemoryBalloon),
 			Usage:  "Minimum memory in MiB for memory ballooning (0 to disable)",
+			Value:  0,
+		},
+		mcnflag.IntFlag{
+			Name:   "memory-balloon",
+			Usage:  "Minimum memory in MiB (alias)",
 			Value:  0,
 		},
 		mcnflag.BoolFlag{
@@ -279,10 +373,19 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			EnvVar: flagEnvVarFromFlagName(flagFullClone),
 			Usage:  "Forces full copy of all disks during template clone",
 		},
+		mcnflag.BoolFlag{
+			Name:   "full-clone",
+			Usage:  "Forces full copy of all disks during template clone (alias)",
+		},
 		mcnflag.StringFlag{
 			Name:   flagDiskSize,
 			EnvVar: flagEnvVarFromFlagName(flagDiskSize),
 			Usage:  "Target disk size (e.g. '20G')",
+			Value:  "",
+		},
+		mcnflag.StringFlag{
+			Name:   "disk-size",
+			Usage:  "Target disk size (alias)",
 			Value:  "",
 		},
 		mcnflag.StringFlag{
@@ -297,16 +400,31 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Usage:  "Network bridge interface (e.g. 'vmbr0')",
 			Value:  "",
 		},
+		mcnflag.StringFlag{
+			Name:   "bridge",
+			Usage:  "Network bridge interface (alias)",
+			Value:  "",
+		},
 		mcnflag.IntFlag{
 			Name:   flagVLAN,
 			EnvVar: flagEnvVarFromFlagName(flagVLAN),
 			Usage:  "Network VLAN tag number",
 			Value:  0,
 		},
+		mcnflag.IntFlag{
+			Name:   "vlan",
+			Usage:  "Network VLAN tag number (alias)",
+			Value:  0,
+		},
 		mcnflag.StringFlag{
 			Name:   flagCIPassword,
 			EnvVar: flagEnvVarFromFlagName(flagCIPassword),
 			Usage:  "Cloud-init user password",
+			Value:  "",
+		},
+		mcnflag.StringFlag{
+			Name:   "cipassword",
+			Usage:  "Cloud-init user password (alias)",
 			Value:  "",
 		},
 		mcnflag.StringFlag{
@@ -322,9 +440,19 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Value:  "",
 		},
 		mcnflag.StringFlag{
+			Name:   "nameserver",
+			Usage:  "Custom DNS nameserver for cloud-init (alias)",
+			Value:  "",
+		},
+		mcnflag.StringFlag{
 			Name:   flagSearchdomain,
 			EnvVar: flagEnvVarFromFlagName(flagSearchdomain),
 			Usage:  "Custom DNS search domain for cloud-init",
+			Value:  "",
+		},
+		mcnflag.StringFlag{
+			Name:   "searchdomain",
+			Usage:  "Custom DNS search domain for cloud-init (alias)",
 			Value:  "",
 		},
 		mcnflag.StringFlag{
@@ -334,9 +462,19 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Value:  "",
 		},
 		mcnflag.StringFlag{
+			Name:   "description",
+			Usage:  "VM description text in Proxmox (alias)",
+			Value:  "",
+		},
+		mcnflag.StringFlag{
 			Name:   flagTags,
 			EnvVar: flagEnvVarFromFlagName(flagTags),
 			Usage:  "Comma-separated list of tags to assign to the VM",
+			Value:  "",
+		},
+		mcnflag.StringFlag{
+			Name:   "tags",
+			Usage:  "Comma-separated list of tags to assign to the VM (alias)",
 			Value:  "",
 		},
 	}
@@ -348,6 +486,9 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 	d.URL = opts.String(flagURL)
 	if d.URL == "" {
+		d.URL = opts.String("url")
+	}
+	if d.URL == "" {
 		return fmt.Errorf("flag '--%s' is required", flagURL)
 	}
 
@@ -355,29 +496,50 @@ func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 		return fmt.Errorf("failed to parse Proxmox VE URL (flag '--%s'): %w", flagURL, err)
 	}
 
-	d.InsecureTLS = opts.Bool(flagInsecureTLS)
+	d.InsecureTLS = opts.Bool(flagInsecureTLS) || opts.Bool("insecure-tls")
 
 	d.TokenID = opts.String(flagTokenID)
+	if d.TokenID == "" {
+		d.TokenID = opts.String("token-id")
+	}
 	if d.TokenID == "" {
 		d.TokenID = opts.String("pve-tokenid")
 	}
 
 	d.TokenSecret = opts.String(flagTokenSecret)
 	if d.TokenSecret == "" {
+		d.TokenSecret = opts.String("token-secret")
+	}
+	if d.TokenSecret == "" {
 		d.TokenSecret = opts.String("pve-tokensecret")
 	}
 
 	d.Username = opts.String(flagUsername)
+	if d.Username == "" {
+		d.Username = opts.String("username")
+	}
 	d.Password = opts.String(flagPassword)
+	if d.Password == "" {
+		d.Password = opts.String("password")
+	}
 	d.Realm = opts.String(flagRealm)
+	if d.Realm == "" {
+		d.Realm = opts.String("realm")
+	}
 
 	if d.TokenID == "" && (d.Username == "" || d.Password == "") {
 		return fmt.Errorf("either API token ('--%s' & '--%s') or credentials ('--%s' & '--%s') are required", flagTokenID, flagTokenSecret, flagUsername, flagPassword)
 	}
 
 	d.NodeName = opts.String(flagNode)
+	if d.NodeName == "" {
+		d.NodeName = opts.String("node")
+	}
 
 	d.ResourcePoolName = opts.String(flagResourcePool)
+	if d.ResourcePoolName == "" {
+		d.ResourcePoolName = opts.String("resource-pool")
+	}
 	if d.ResourcePoolName == "" {
 		d.ResourcePoolName = opts.String("pve-resourcepool")
 	}
@@ -387,15 +549,20 @@ func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 
 	var err error
 
-	if tStr := opts.String(flagTemplateID); tStr != "" {
+	if tVal := opts.Int(flagTemplateID); tVal > 0 {
+		d.TemplateID = tVal
+	} else if tVal := opts.Int("template"); tVal > 0 {
+		d.TemplateID = tVal
+	} else if tVal := opts.Int("pve-template-id"); tVal > 0 {
+		d.TemplateID = tVal
+	} else if tVal := opts.Int("template-id"); tVal > 0 {
+		d.TemplateID = tVal
+	} else if tStr := opts.String(flagTemplateID); tStr != "" {
+		d.TemplateID, _ = strconv.Atoi(tStr)
+	} else if tStr := opts.String("template"); tStr != "" {
 		d.TemplateID, _ = strconv.Atoi(tStr)
 	} else if tStr := opts.String("pve-template-id"); tStr != "" {
 		d.TemplateID, _ = strconv.Atoi(tStr)
-	} else {
-		d.TemplateID = opts.Int(flagTemplateID)
-		if d.TemplateID <= 0 {
-			d.TemplateID = opts.Int("pve-template-id")
-		}
 	}
 
 	if d.TemplateID <= 0 {
@@ -403,6 +570,9 @@ func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 	}
 
 	d.ISODeviceName = strings.ToLower(opts.String(flagISODevice))
+	if d.ISODeviceName == "" {
+		d.ISODeviceName = strings.ToLower(opts.String("iso-device"))
+	}
 	if d.ISODeviceName == "" {
 		d.ISODeviceName = strings.ToLower(opts.String("pve-isodevice"))
 	}
@@ -412,6 +582,9 @@ func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 
 	d.NetworkInterfaceName = opts.String(flagNetworkInterface)
 	if d.NetworkInterfaceName == "" {
+		d.NetworkInterfaceName = opts.String("network-interface")
+	}
+	if d.NetworkInterfaceName == "" {
 		d.NetworkInterfaceName = opts.String("pve-networkinterface")
 	}
 	if d.NetworkInterfaceName == "" {
@@ -420,43 +593,52 @@ func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 
 	d.SSHUser = opts.String(flagSSHUser)
 	if d.SSHUser == "" {
+		d.SSHUser = opts.String("ssh-user")
+	}
+	if d.SSHUser == "" {
 		d.SSHUser = defaultSSHUser
 	}
 
-	if pStr := opts.String(flagSSHPort); pStr != "" {
+	if pVal := opts.Int(flagSSHPort); pVal > 0 {
+		d.SSHPort = pVal
+	} else if pVal := opts.Int("ssh-port"); pVal > 0 {
+		d.SSHPort = pVal
+	} else if pStr := opts.String(flagSSHPort); pStr != "" {
 		d.SSHPort, _ = strconv.Atoi(pStr)
 	} else {
-		d.SSHPort = opts.Int(flagSSHPort)
-	}
-
-	if d.SSHPort == 0 {
 		d.SSHPort = defaultSSHPort
-	} else if d.SSHPort < 0 {
-		return fmt.Errorf("flag '--%s' must be > 0", flagSSHPort)
 	}
 
-	if d.ProcessorSockets, err = parseStringFlagToInt(opts.String(flagProcessorSockets)); err != nil {
-		return fmt.Errorf("failed to parse '--%s': %w", flagProcessorSockets, err)
-	} else if d.ProcessorSockets != nil && *d.ProcessorSockets < 1 {
-		return fmt.Errorf("flag '--%s' must be >= 1", flagProcessorSockets)
-	}
-
-	if d.ProcessorCores, err = parseStringFlagToInt(opts.String(flagProcessorCores)); err != nil {
+	if cores := opts.Int(flagProcessorCores); cores > 0 {
+		d.ProcessorCores = &cores
+	} else if cores := opts.Int("processor-cores"); cores > 0 {
+		d.ProcessorCores = &cores
+	} else if d.ProcessorCores, err = parseStringFlagToInt(opts.String(flagProcessorCores)); err != nil {
 		return fmt.Errorf("failed to parse '--%s': %w", flagProcessorCores, err)
-	} else if d.ProcessorCores != nil && *d.ProcessorCores < 1 {
-		return fmt.Errorf("flag '--%s' must be >= 1", flagProcessorCores)
 	}
 
-	if d.Memory, err = parseStringFlagToInt(opts.String(flagMemory)); err != nil {
+	if sockets := opts.Int(flagProcessorSockets); sockets > 0 {
+		d.ProcessorSockets = &sockets
+	} else if sockets := opts.Int("processor-sockets"); sockets > 0 {
+		d.ProcessorSockets = &sockets
+	} else if d.ProcessorSockets, err = parseStringFlagToInt(opts.String(flagProcessorSockets)); err != nil {
+		return fmt.Errorf("failed to parse '--%s': %w", flagProcessorSockets, err)
+	}
+
+	if mem := opts.Int(flagMemory); mem > 0 {
+		d.Memory = &mem
+	} else if mem := opts.Int("memory"); mem > 0 {
+		d.Memory = &mem
+	} else if d.Memory, err = parseStringFlagToInt(opts.String(flagMemory)); err != nil {
 		return fmt.Errorf("failed to parse '--%s': %w", flagMemory, err)
-	} else if d.Memory != nil && *d.Memory < 1 {
-		return fmt.Errorf("flag '--%s' must be >= 1", flagMemory)
 	}
 
-	if d.MemoryBalloon, err = parseStringFlagToInt(opts.String(flagMemoryBalloon)); err != nil {
+	if bal := opts.Int(flagMemoryBalloon); bal >= 0 {
+		d.MemoryBalloon = &bal
+	} else if bal := opts.Int("memory-balloon"); bal >= 0 {
+		d.MemoryBalloon = &bal
+	} else if d.MemoryBalloon, err = parseStringFlagToInt(opts.String(flagMemoryBalloon)); err != nil {
 		return fmt.Errorf("failed to parse '--%s': %w", flagMemoryBalloon, err)
-	} else if d.MemoryBalloon != nil && *d.MemoryBalloon < 0 {
-		return fmt.Errorf("flag '--%s' must be >= 1; set to 0 to disable", flagMemoryBalloon)
 	}
 
 	// Default memory/memory balloon to the other one if it's set
@@ -472,29 +654,52 @@ func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 		return fmt.Errorf("flag '--%s' must be <= than flag '--%s'", flagMemoryBalloon, flagMemory)
 	}
 
-	d.FullClone = opts.Bool(flagFullClone)
+	d.FullClone = opts.Bool(flagFullClone) || opts.Bool("full-clone")
 	d.DiskSize = opts.String(flagDiskSize)
+	if d.DiskSize == "" {
+		d.DiskSize = opts.String("disk-size")
+	}
 	if d.DiskSize == "" {
 		d.DiskSize = opts.String("pve-disksize")
 	}
 
 	d.Bridge = opts.String(flagBridge)
-
-	if vStr := opts.String(flagVLAN); vStr != "" {
-		d.VLAN, _ = strconv.Atoi(vStr)
-	} else {
-		d.VLAN = opts.Int(flagVLAN)
+	if d.Bridge == "" {
+		d.Bridge = opts.String("bridge")
 	}
+
+	if vVal := opts.Int(flagVLAN); vVal > 0 {
+		d.VLAN = vVal
+	} else if vVal := opts.Int("vlan"); vVal > 0 {
+		d.VLAN = vVal
+	}
+
 	d.CIPassword = opts.String(flagCIPassword)
+	if d.CIPassword == "" {
+		d.CIPassword = opts.String("cipassword")
+	}
 	if d.CIPassword == "" {
 		d.CIPassword = opts.String("pve-ci-password")
 	}
 	d.Nameserver = opts.String(flagNameserver)
+	if d.Nameserver == "" {
+		d.Nameserver = opts.String("nameserver")
+	}
 	d.Searchdomain = opts.String(flagSearchdomain)
+	if d.Searchdomain == "" {
+		d.Searchdomain = opts.String("searchdomain")
+	}
 	d.Description = opts.String(flagDescription)
+	if d.Description == "" {
+		d.Description = opts.String("description")
+	}
 
-	if opts.String(flagTags) != "" {
-		d.Tags = strings.Split(opts.String(flagTags), ",")
+	tagsStr := opts.String(flagTags)
+	if tagsStr == "" {
+		tagsStr = opts.String("tags")
+	}
+	if tagsStr != "" {
+		d.Tags = strings.Split(tagsStr, ",")
 	}
 
 	return nil
