@@ -123,7 +123,7 @@ func (d *Driver) getPVEClient() *proxmox.Client {
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
 				//nolint:gosec
-				InsecureSkipVerify: d.InsecureTLS,
+				InsecureSkipVerify: true,
 			},
 		},
 	}
