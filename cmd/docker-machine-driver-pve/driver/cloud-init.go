@@ -29,6 +29,11 @@ func (d *Driver) setupCloudinit(ctx context.Context) error {
 		return fmt.Errorf("failed to generate cloud-init userdata: %w", err)
 	}
 
+	if machine.VirtualMachineConfig != nil && !strings.HasPrefix(machine.VirtualMachineConfig.Boot, "order=") {
+		bootVal := fmt.Sprintf("order=scsi0;%s", d.ISODeviceName)
+		_ = machine.Config(ctx, proxmox.VirtualMachineConfigOption{Name: "boot", Value: bootVal})
+	}
+
 	if err := machine.CloudInit(ctx, d.ISODeviceName, cloudinitUserdata, cloudinitMetadata, "", ""); err != nil {
 		return fmt.Errorf("failed to configure cloud-init for Proxmox VE virtual machine ID='%d': %w", machine.VMID, err)
 	}
