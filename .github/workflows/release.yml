@@ -4,103 +4,36 @@ on:
   push:
     tags:
       - "v*"
-
-concurrency:
-  group: gh-pages
-  cancel-in-progress: false
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  build:
-    name: GitHub
+  release:
+    name: Build & Release Binary
     runs-on: ubuntu-latest
     steps:
-      # Set-up git
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - run: >
-          git config user.name 'github-actions[bot]'
-          && git config user.email 'github-actions[bot]@users.noreply.github.com'
-      - name: Get Pages url
-        id: pages
-        uses: actions/configure-pages@v2
-        with:
-          enablement: false
-      # Set-up build environment
-      - name: Install Helm
-        uses: azure/setup-helm@v4.3.0
-      - name: Install Go
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version-file: go.mod
-      - name: Pull Go dependencies
-        run: go mod vendor
-      - name: Install Node
-        uses: actions/setup-node@v4
+          go-version: '1.24'
+
+      - name: Build Driver Binary
+        run: |
+          mkdir -p build
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o build/docker-machine-driver-pve ./cmd/docker-machine-driver-pve
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
         with:
-          node-version: 20
-          cache: yarn
-      - name: Pull Node dependencies
-        run: yarn install --frozen-lockfile
-      - name: Install go-licenses
-        run: >
-          mkdir -p ./tools
-          && export GOBIN="$(realpath ./tools)"
-          && go install github.com/google/go-licenses@v1.6.0
-      # Build release artifacts
-      - run: mkdir -p ./release_artifacts
-      - name: Build driver binaries
-        run: >
-          go build -o ./release_artifacts/docker-machine-driver-pve ./cmd/docker-machine-driver-pve
-          && (cd ./release_artifacts && sha256sum ./docker-machine-driver-pve > checksums.txt)
+          files: build/docker-machine-driver-pve
+          name: ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
         env:
-          CGO_ENABLED: 0
-          GOOS: linux
-          GOARCH: amd64
-      - name: Build Rancher UI Extension
-        run: >
-          (cd pkg/pve-node-driver && yarn version --new-version "${GITHUB_REF_NAME#v}" --no-git-tag-version)
-          && yarn build-pkg pve-node-driver
-      - name: Package Helm Chart
-        run: >
-          CHECKSUM="$(sha256sum ./release_artifacts/docker-machine-driver-pve | cut -d' ' -f1)"
-          && yq -i ".nodeDriver.url = \"${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/docker-machine-driver-pve\"" deploy/charts/pve-node-driver/values.yaml
-          && yq -i ".nodeDriver.checksum = \"${CHECKSUM}\"" deploy/charts/pve-node-driver/values.yaml
-          && yq -i ".uiPlugin.endpoint = \"${{ steps.pages.outputs.base_url }}/extensions/pve-node-driver/${GITHUB_REF_NAME#v}\"" deploy/charts/pve-node-driver/values.yaml
-          && cat deploy/charts/pve-node-driver/values.yaml
-          && helm package ./deploy/charts/pve-node-driver \
-              --version "${GITHUB_REF_NAME#v}" \
-              --app-version "${GITHUB_REF_NAME}" \
-              --destination ./release_artifacts
-      - name: Generate licenses.txt
-        run: >
-          ./tasks/licenses-save.sh
-          && mv licenses.txt ./release_artifacts
-      # Release
-      - name: Create GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: >
-          RELEASE_FLAGS=""
-          && if [[ "${GITHUB_REF_NAME}" == *"-rc"* ]]; then RELEASE_FLAGS="--prerelease"; fi
-          && gh release create "${GITHUB_REF_NAME}" \
-            --repo="${GITHUB_REPOSITORY}" \
-            --title="${GITHUB_REF_NAME}" \
-            $RELEASE_FLAGS \
-            --generate-notes \
-            ./release_artifacts/*
-      - name: Push artifacts to GitHub Pages
-        run: >
-          git checkout gh-pages --force
-          && helm repo index ./release_artifacts --merge ./index.yaml --url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}"
-          && cp ./release_artifacts/index.yaml ./index.yaml
-          && git add ./index.yaml
-          && mkdir -p "./extensions/pve-node-driver/${GITHUB_REF_NAME#v}/plugin"
-          && cp ./dist-pkg/pve-node-driver-${GITHUB_REF_NAME#v}/* "extensions/pve-node-driver/${GITHUB_REF_NAME#v}/plugin"
-          && (cd "extensions/pve-node-driver/${GITHUB_REF_NAME#v}" && find * -type f | sort) > "extensions/pve-node-driver/${GITHUB_REF_NAME#v}/files.txt"
-          && git add "extensions/pve-node-driver/${GITHUB_REF_NAME#v}"
-          && git commit -m "chore: update Helm repo index for ${GITHUB_REF_NAME}"
-          && git push origin gh-pages
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
