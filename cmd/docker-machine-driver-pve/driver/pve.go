@@ -55,6 +55,25 @@ func (d *Driver) getPVETemplate(ctx context.Context) (*proxmox.VirtualMachine, e
 
 // Returns a Proxmox VE virtual machine from the current resource pool.
 func (d *Driver) getPVEVirtualMachine(ctx context.Context, vmid int) (*proxmox.VirtualMachine, error) {
+	if d.ResourcePoolName == "" {
+		if d.NodeName != "" {
+			return d.getPVEVirtualMachineOnNode(ctx, vmid, d.NodeName)
+		}
+		cluster, err := d.getPVEClient().Cluster(ctx)
+		if err == nil {
+			nodes, err := cluster.Nodes(ctx)
+			if err == nil {
+				for _, n := range nodes {
+					vm, err := d.getPVEVirtualMachineOnNode(ctx, vmid, n.Name)
+					if err == nil && vm != nil {
+						return vm, nil
+					}
+				}
+			}
+		}
+		return nil, fmt.Errorf("failed to retrieve Proxmox VE virtual machine ID='%d': not found on any node", vmid)
+	}
+
 	resourcePool, err := d.getCurrentPVEResourcePool(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve Proxmox VE virtual machine ID='%d': %w", vmid, err)
@@ -92,6 +111,9 @@ func (d *Driver) getPVEVirtualMachineOnNode(ctx context.Context, vmid int, nodeN
 
 // Returns the current Proxmox VE resource pool.
 func (d *Driver) getCurrentPVEResourcePool(ctx context.Context) (*proxmox.Pool, error) {
+	if d.ResourcePoolName == "" {
+		return nil, nil
+	}
 	resourcePool, err := d.getPVEClient().Pool(ctx, d.ResourcePoolName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve Proxmox VE resource pool name='%s': %w", d.ResourcePoolName, err)
