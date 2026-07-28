@@ -143,9 +143,21 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Value:  "",
 		},
 		mcnflag.StringFlag{
+			Name:   "pve-tokenid",
+			EnvVar: "PVE_TOKENID",
+			Usage:  "Proxmox VE API Token ID (alias)",
+			Value:  "",
+		},
+		mcnflag.StringFlag{
 			Name:   flagTokenSecret,
 			EnvVar: flagEnvVarFromFlagName(flagTokenSecret),
 			Usage:  "Proxmox VE API Token secret",
+			Value:  "",
+		},
+		mcnflag.StringFlag{
+			Name:   "pve-tokensecret",
+			EnvVar: "PVE_TOKENSECRET",
+			Usage:  "Proxmox VE API Token secret (alias)",
 			Value:  "",
 		},
 		mcnflag.StringFlag{
@@ -176,6 +188,18 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Name:   flagResourcePool,
 			EnvVar: flagEnvVarFromFlagName(flagResourcePool),
 			Usage:  "Proxmox VE Resource Pool name",
+			Value:  "",
+		},
+		mcnflag.StringFlag{
+			Name:   "pve-resourcepool",
+			EnvVar: "PVE_RESOURCEPOOL",
+			Usage:  "Proxmox VE Resource Pool name (alias)",
+			Value:  "",
+		},
+		mcnflag.StringFlag{
+			Name:   "pve-pool",
+			EnvVar: "PVE_POOL",
+			Usage:  "Proxmox VE Resource Pool name (alias)",
 			Value:  "",
 		},
 		mcnflag.IntFlag{
@@ -334,7 +358,15 @@ func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 	d.InsecureTLS = opts.Bool(flagInsecureTLS)
 
 	d.TokenID = opts.String(flagTokenID)
+	if d.TokenID == "" {
+		d.TokenID = opts.String("pve-tokenid")
+	}
+
 	d.TokenSecret = opts.String(flagTokenSecret)
+	if d.TokenSecret == "" {
+		d.TokenSecret = opts.String("pve-tokensecret")
+	}
+
 	d.Username = opts.String(flagUsername)
 	d.Password = opts.String(flagPassword)
 	d.Realm = opts.String(flagRealm)
@@ -344,7 +376,14 @@ func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 	}
 
 	d.NodeName = opts.String(flagNode)
+
 	d.ResourcePoolName = opts.String(flagResourcePool)
+	if d.ResourcePoolName == "" {
+		d.ResourcePoolName = opts.String("pve-resourcepool")
+	}
+	if d.ResourcePoolName == "" {
+		d.ResourcePoolName = opts.String("pve-pool")
+	}
 
 	var err error
 
