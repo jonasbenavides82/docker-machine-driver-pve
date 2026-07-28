@@ -134,7 +134,7 @@ func (d *Driver) getPVEClient() *proxmox.Client {
 		panic(fmt.Errorf("failed to parse Proxmox VE URL: %w", err).Error())
 	}
 
-	options := []proxmox.ClientOption{
+	options := []proxmox.Option{
 		proxmox.WithHTTPClient(&httpClient),
 	}
 
@@ -145,7 +145,11 @@ func (d *Driver) getPVEClient() *proxmox.Client {
 		if realm == "" {
 			realm = "pam"
 		}
-		options = append(options, proxmox.WithCredentials(d.Username, d.Password, realm))
+		options = append(options, proxmox.WithCredentials(&proxmox.Credentials{
+			Username: d.Username,
+			Password: d.Password,
+			Realm:    realm,
+		}))
 	}
 
 	d.pveClient = proxmox.NewClient(
