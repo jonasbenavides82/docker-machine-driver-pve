@@ -170,15 +170,17 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			EnvVar: flagEnvVarFromFlagName(flagResourcePool),
 			Usage:  "Proxmox VE Resource Pool name",
 		},
-		mcnflag.StringFlag{
+		mcnflag.IntFlag{
 			Name:   flagTemplateID,
 			EnvVar: flagEnvVarFromFlagName(flagTemplateID),
 			Usage:  "ID of the Proxmox VE template",
+			Value:  0,
 		},
-		mcnflag.StringFlag{
+		mcnflag.IntFlag{
 			Name:   "pve-template-id",
 			EnvVar: "PVE_TEMPLATE_ID",
 			Usage:  "ID of the Proxmox VE template (alias)",
+			Value:  0,
 		},
 		mcnflag.StringFlag{
 			Name:   flagISODevice,
@@ -205,30 +207,35 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			EnvVar: flagEnvVarFromFlagName(flagSSHUser),
 			Usage:  fmt.Sprintf("SSH user created via cloud-init, defaults to '%s'", defaultSSHUser),
 		},
-		mcnflag.StringFlag{
+		mcnflag.IntFlag{
 			Name:   flagSSHPort,
 			EnvVar: flagEnvVarFromFlagName(flagSSHPort),
 			Usage:  fmt.Sprintf("SSH port, defaults to '%d'", defaultSSHPort),
+			Value:  defaultSSHPort,
 		},
-		mcnflag.StringFlag{
+		mcnflag.IntFlag{
 			Name:   flagProcessorSockets,
 			EnvVar: flagEnvVarFromFlagName(flagProcessorSockets),
 			Usage:  "Processor sockets count for the VM",
+			Value:  1,
 		},
-		mcnflag.StringFlag{
+		mcnflag.IntFlag{
 			Name:   flagProcessorCores,
 			EnvVar: flagEnvVarFromFlagName(flagProcessorCores),
 			Usage:  "Processor cores count for the VM",
+			Value:  1,
 		},
-		mcnflag.StringFlag{
+		mcnflag.IntFlag{
 			Name:   flagMemory,
 			EnvVar: flagEnvVarFromFlagName(flagMemory),
 			Usage:  "Memory size in MiB for the VM",
+			Value:  2048,
 		},
-		mcnflag.StringFlag{
+		mcnflag.IntFlag{
 			Name:   flagMemoryBalloon,
 			EnvVar: flagEnvVarFromFlagName(flagMemoryBalloon),
 			Usage:  "Minimum memory in MiB for memory ballooning (0 to disable)",
+			Value:  0,
 		},
 		mcnflag.BoolFlag{
 			Name:   flagFullClone,
@@ -250,10 +257,11 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			EnvVar: flagEnvVarFromFlagName(flagBridge),
 			Usage:  "Network bridge interface (e.g. 'vmbr0')",
 		},
-		mcnflag.StringFlag{
+		mcnflag.IntFlag{
 			Name:   flagVLAN,
 			EnvVar: flagEnvVarFromFlagName(flagVLAN),
 			Usage:  "Network VLAN tag number",
+			Value:  0,
 		},
 		mcnflag.StringFlag{
 			Name:   flagCIPassword,
