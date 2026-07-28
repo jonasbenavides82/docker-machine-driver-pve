@@ -497,6 +497,15 @@ func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 	}
 
 	d.InsecureTLS = opts.Bool(flagInsecureTLS) || opts.Bool("insecure-tls")
+	if !d.InsecureTLS {
+		tlsStr := strings.ToLower(opts.String(flagInsecureTLS))
+		if tlsStr == "" {
+			tlsStr = strings.ToLower(opts.String("insecure-tls"))
+		}
+		if tlsStr == "true" || tlsStr == "1" || tlsStr == "yes" {
+			d.InsecureTLS = true
+		}
+	}
 
 	d.TokenID = opts.String(flagTokenID)
 	if d.TokenID == "" {
@@ -655,6 +664,15 @@ func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 	}
 
 	d.FullClone = opts.Bool(flagFullClone) || opts.Bool("full-clone")
+	if !d.FullClone {
+		fcStr := strings.ToLower(opts.String(flagFullClone))
+		if fcStr == "" {
+			fcStr = strings.ToLower(opts.String("full-clone"))
+		}
+		if fcStr == "true" || fcStr == "1" || fcStr == "yes" {
+			d.FullClone = true
+		}
+	}
 	d.DiskSize = opts.String(flagDiskSize)
 	if d.DiskSize == "" {
 		d.DiskSize = opts.String("disk-size")
