@@ -129,6 +129,7 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Name:   flagURL,
 			EnvVar: flagEnvVarFromFlagName(flagURL),
 			Usage:  "Proxmox VE URL (e.g. 'https://<PROXMOX VE ADDRESS>:8006')",
+			Value:  "",
 		},
 		mcnflag.BoolFlag{
 			Name:   flagInsecureTLS,
@@ -139,36 +140,43 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Name:   flagTokenID,
 			EnvVar: flagEnvVarFromFlagName(flagTokenID),
 			Usage:  "Proxmox VE API Token ID (e.g. 'root@pam!rancher')",
+			Value:  "",
 		},
 		mcnflag.StringFlag{
 			Name:   flagTokenSecret,
 			EnvVar: flagEnvVarFromFlagName(flagTokenSecret),
 			Usage:  "Proxmox VE API Token secret",
+			Value:  "",
 		},
 		mcnflag.StringFlag{
 			Name:   flagUsername,
 			EnvVar: flagEnvVarFromFlagName(flagUsername),
 			Usage:  "Proxmox VE Username (legacy auth fallback)",
+			Value:  "",
 		},
 		mcnflag.StringFlag{
 			Name:   flagPassword,
 			EnvVar: flagEnvVarFromFlagName(flagPassword),
 			Usage:  "Proxmox VE Password (legacy auth fallback)",
+			Value:  "",
 		},
 		mcnflag.StringFlag{
 			Name:   flagRealm,
 			EnvVar: flagEnvVarFromFlagName(flagRealm),
 			Usage:  "Proxmox VE Auth Realm (defaults to 'pam')",
+			Value:  "",
 		},
 		mcnflag.StringFlag{
 			Name:   flagNode,
 			EnvVar: flagEnvVarFromFlagName(flagNode),
 			Usage:  "Proxmox VE Node name to host the VM (optional)",
+			Value:  "",
 		},
 		mcnflag.StringFlag{
 			Name:   flagResourcePool,
 			EnvVar: flagEnvVarFromFlagName(flagResourcePool),
 			Usage:  "Proxmox VE Resource Pool name",
+			Value:  "",
 		},
 		mcnflag.IntFlag{
 			Name:   flagTemplateID,
@@ -186,26 +194,31 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Name:   flagISODevice,
 			EnvVar: flagEnvVarFromFlagName(flagISODevice),
 			Usage:  "Bus/Device of CD/DVD Drive for cloud-init ISO (e.g. 'scsi1')",
+			Value:  "scsi1",
 		},
 		mcnflag.StringFlag{
 			Name:   "pve-isodevice",
 			EnvVar: "PVE_ISODEVICE",
 			Usage:  "Bus/Device of CD/DVD Drive for cloud-init ISO (alias)",
+			Value:  "scsi1",
 		},
 		mcnflag.StringFlag{
 			Name:   flagNetworkInterface,
 			EnvVar: flagEnvVarFromFlagName(flagNetworkInterface),
 			Usage:  "Bus/Device of network interface (e.g. 'net0')",
+			Value:  "net0",
 		},
 		mcnflag.StringFlag{
 			Name:   "pve-networkinterface",
 			EnvVar: "PVE_NETWORKINTERFACE",
 			Usage:  "Bus/Device of network interface (alias)",
+			Value:  "net0",
 		},
 		mcnflag.StringFlag{
 			Name:   flagSSHUser,
 			EnvVar: flagEnvVarFromFlagName(flagSSHUser),
 			Usage:  fmt.Sprintf("SSH user created via cloud-init, defaults to '%s'", defaultSSHUser),
+			Value:  defaultSSHUser,
 		},
 		mcnflag.IntFlag{
 			Name:   flagSSHPort,
@@ -246,16 +259,19 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Name:   flagDiskSize,
 			EnvVar: flagEnvVarFromFlagName(flagDiskSize),
 			Usage:  "Target disk size (e.g. '20G')",
+			Value:  "",
 		},
 		mcnflag.StringFlag{
 			Name:   "pve-disksize",
 			EnvVar: "PVE_DISKSIZE",
 			Usage:  "Target disk size (alias)",
+			Value:  "",
 		},
 		mcnflag.StringFlag{
 			Name:   flagBridge,
 			EnvVar: flagEnvVarFromFlagName(flagBridge),
 			Usage:  "Network bridge interface (e.g. 'vmbr0')",
+			Value:  "",
 		},
 		mcnflag.IntFlag{
 			Name:   flagVLAN,
@@ -267,31 +283,37 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Name:   flagCIPassword,
 			EnvVar: flagEnvVarFromFlagName(flagCIPassword),
 			Usage:  "Cloud-init user password",
+			Value:  "",
 		},
 		mcnflag.StringFlag{
 			Name:   "pve-ci-password",
 			EnvVar: "PVE_CI_PASSWORD",
 			Usage:  "Cloud-init user password (alias)",
+			Value:  "",
 		},
 		mcnflag.StringFlag{
 			Name:   flagNameserver,
 			EnvVar: flagEnvVarFromFlagName(flagNameserver),
 			Usage:  "Custom DNS nameserver for cloud-init",
+			Value:  "",
 		},
 		mcnflag.StringFlag{
 			Name:   flagSearchdomain,
 			EnvVar: flagEnvVarFromFlagName(flagSearchdomain),
 			Usage:  "Custom DNS search domain for cloud-init",
+			Value:  "",
 		},
 		mcnflag.StringFlag{
 			Name:   flagDescription,
 			EnvVar: flagEnvVarFromFlagName(flagDescription),
 			Usage:  "VM description text in Proxmox",
+			Value:  "",
 		},
 		mcnflag.StringFlag{
 			Name:   flagTags,
 			EnvVar: flagEnvVarFromFlagName(flagTags),
 			Usage:  "Comma-separated list of tags to assign to the VM",
+			Value:  "",
 		},
 	}
 }
