@@ -62,8 +62,16 @@ func (d *Driver) getPVEVirtualMachine(ctx context.Context, vmid int) (*proxmox.V
 		nodes, err := d.getPVEClient().Nodes(ctx)
 		if err == nil {
 			for _, n := range nodes {
-				vm, err := d.getPVEVirtualMachineOnNode(ctx, vmid, n.Name)
+				nodeName := n.Node
+				if nodeName == "" {
+					nodeName = n.Name
+				}
+				vm, err := d.getPVEVirtualMachineOnNode(ctx, vmid, nodeName)
 				if err == nil && vm != nil {
+					// Store target node on driver so cloning target uses this node if NodeName was empty
+					if d.NodeName == "" {
+						d.NodeName = nodeName
+					}
 					return vm, nil
 				}
 			}

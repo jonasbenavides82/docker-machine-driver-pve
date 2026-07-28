@@ -87,7 +87,9 @@ func (d *Driver) PreCreateCheck() error {
 		return fmt.Errorf("network interface '%s' not found on the template", d.NetworkInterfaceName)
 	}
 
-	log.Debugf("Using resource pool '%s'", resourcePool.PoolID)
+	if resourcePool != nil {
+		log.Debugf("Using resource pool '%s'", resourcePool.PoolID)
+	}
 	log.Debugf("Using template name '%s' on node '%s'", template.Name, template.Node)
 	log.Debugf("Using device '%s' for cloud-init ISO", d.ISODeviceName)
 	log.Debugf("Using network interface '%s' for IP address", d.NetworkInterfaceName)
