@@ -59,15 +59,12 @@ func (d *Driver) getPVEVirtualMachine(ctx context.Context, vmid int) (*proxmox.V
 		if d.NodeName != "" {
 			return d.getPVEVirtualMachineOnNode(ctx, vmid, d.NodeName)
 		}
-		cluster, err := d.getPVEClient().Cluster(ctx)
+		nodes, err := d.getPVEClient().Nodes(ctx)
 		if err == nil {
-			nodes, err := cluster.Nodes(ctx)
-			if err == nil {
-				for _, n := range nodes {
-					vm, err := d.getPVEVirtualMachineOnNode(ctx, vmid, n.Name)
-					if err == nil && vm != nil {
-						return vm, nil
-					}
+			for _, n := range nodes {
+				vm, err := d.getPVEVirtualMachineOnNode(ctx, vmid, n.Name)
+				if err == nil && vm != nil {
+					return vm, nil
 				}
 			}
 		}
