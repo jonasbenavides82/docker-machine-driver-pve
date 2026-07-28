@@ -176,14 +176,29 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Usage:  "ID of the Proxmox VE template",
 		},
 		mcnflag.StringFlag{
+			Name:   "pve-template-id",
+			EnvVar: "PVE_TEMPLATE_ID",
+			Usage:  "ID of the Proxmox VE template (alias)",
+		},
+		mcnflag.StringFlag{
 			Name:   flagISODevice,
 			EnvVar: flagEnvVarFromFlagName(flagISODevice),
 			Usage:  "Bus/Device of CD/DVD Drive for cloud-init ISO (e.g. 'scsi1')",
 		},
 		mcnflag.StringFlag{
+			Name:   "pve-isodevice",
+			EnvVar: "PVE_ISODEVICE",
+			Usage:  "Bus/Device of CD/DVD Drive for cloud-init ISO (alias)",
+		},
+		mcnflag.StringFlag{
 			Name:   flagNetworkInterface,
 			EnvVar: flagEnvVarFromFlagName(flagNetworkInterface),
 			Usage:  "Bus/Device of network interface (e.g. 'net0')",
+		},
+		mcnflag.StringFlag{
+			Name:   "pve-networkinterface",
+			EnvVar: "PVE_NETWORKINTERFACE",
+			Usage:  "Bus/Device of network interface (alias)",
 		},
 		mcnflag.StringFlag{
 			Name:   flagSSHUser,
@@ -226,6 +241,11 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Usage:  "Target disk size (e.g. '20G')",
 		},
 		mcnflag.StringFlag{
+			Name:   "pve-disksize",
+			EnvVar: "PVE_DISKSIZE",
+			Usage:  "Target disk size (alias)",
+		},
+		mcnflag.StringFlag{
 			Name:   flagBridge,
 			EnvVar: flagEnvVarFromFlagName(flagBridge),
 			Usage:  "Network bridge interface (e.g. 'vmbr0')",
@@ -239,6 +259,11 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Name:   flagCIPassword,
 			EnvVar: flagEnvVarFromFlagName(flagCIPassword),
 			Usage:  "Cloud-init user password",
+		},
+		mcnflag.StringFlag{
+			Name:   "pve-ci-password",
+			EnvVar: "PVE_CI_PASSWORD",
+			Usage:  "Cloud-init user password (alias)",
 		},
 		mcnflag.StringFlag{
 			Name:   flagNameserver,
@@ -294,11 +319,14 @@ func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 	var err error
 
 	if tStr := opts.String(flagTemplateID); tStr != "" {
-		if d.TemplateID, err = strconv.Atoi(tStr); err != nil {
-			return fmt.Errorf("failed to parse '--%s': %w", flagTemplateID, err)
-		}
+		d.TemplateID, _ = strconv.Atoi(tStr)
+	} else if tStr := opts.String("pve-template-id"); tStr != "" {
+		d.TemplateID, _ = strconv.Atoi(tStr)
 	} else {
 		d.TemplateID = opts.Int(flagTemplateID)
+		if d.TemplateID <= 0 {
+			d.TemplateID = opts.Int("pve-template-id")
+		}
 	}
 
 	if d.TemplateID <= 0 {
@@ -307,10 +335,16 @@ func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 
 	d.ISODeviceName = strings.ToLower(opts.String(flagISODevice))
 	if d.ISODeviceName == "" {
+		d.ISODeviceName = strings.ToLower(opts.String("pve-isodevice"))
+	}
+	if d.ISODeviceName == "" {
 		d.ISODeviceName = "scsi1"
 	}
 
 	d.NetworkInterfaceName = opts.String(flagNetworkInterface)
+	if d.NetworkInterfaceName == "" {
+		d.NetworkInterfaceName = opts.String("pve-networkinterface")
+	}
 	if d.NetworkInterfaceName == "" {
 		d.NetworkInterfaceName = "net0"
 	}
@@ -371,6 +405,10 @@ func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 
 	d.FullClone = opts.Bool(flagFullClone)
 	d.DiskSize = opts.String(flagDiskSize)
+	if d.DiskSize == "" {
+		d.DiskSize = opts.String("pve-disksize")
+	}
+
 	d.Bridge = opts.String(flagBridge)
 
 	if vStr := opts.String(flagVLAN); vStr != "" {
@@ -379,6 +417,9 @@ func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 		d.VLAN = opts.Int(flagVLAN)
 	}
 	d.CIPassword = opts.String(flagCIPassword)
+	if d.CIPassword == "" {
+		d.CIPassword = opts.String("pve-ci-password")
+	}
 	d.Nameserver = opts.String(flagNameserver)
 	d.Searchdomain = opts.String(flagSearchdomain)
 	d.Description = opts.String(flagDescription)
