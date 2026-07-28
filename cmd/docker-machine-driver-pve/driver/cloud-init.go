@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/luthermonson/go-proxmox"
@@ -31,7 +32,7 @@ func (d *Driver) setupCloudinit(ctx context.Context) error {
 
 	if machine.VirtualMachineConfig != nil && !strings.HasPrefix(machine.VirtualMachineConfig.Boot, "order=") {
 		bootVal := fmt.Sprintf("order=scsi0;%s", d.ISODeviceName)
-		_ = machine.Config(ctx, proxmox.VirtualMachineConfigOption{Name: "boot", Value: bootVal})
+		_, _ = machine.Config(ctx, proxmox.VirtualMachineOption{Name: "boot", Value: bootVal})
 	}
 
 	if err := machine.CloudInit(ctx, d.ISODeviceName, cloudinitUserdata, cloudinitMetadata, "", ""); err != nil {
