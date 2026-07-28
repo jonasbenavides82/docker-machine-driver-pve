@@ -290,9 +290,6 @@ func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 
 	d.NodeName = opts.String(flagNode)
 	d.ResourcePoolName = opts.String(flagResourcePool)
-	if d.ResourcePoolName == "" {
-		return fmt.Errorf("flag '--%s' is required", flagResourcePool)
-	}
 
 	d.TemplateID = opts.Int(flagTemplateID)
 	if d.TemplateID <= 0 {
@@ -301,12 +298,12 @@ func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 
 	d.ISODeviceName = strings.ToLower(opts.String(flagISODevice))
 	if d.ISODeviceName == "" {
-		return fmt.Errorf("flag '--%s' is required", flagISODevice)
+		d.ISODeviceName = "scsi1"
 	}
 
 	d.NetworkInterfaceName = opts.String(flagNetworkInterface)
 	if d.NetworkInterfaceName == "" {
-		return fmt.Errorf("flag '--%s' is required", flagNetworkInterface)
+		d.NetworkInterfaceName = "net0"
 	}
 
 	d.SSHUser = opts.String(flagSSHUser)
