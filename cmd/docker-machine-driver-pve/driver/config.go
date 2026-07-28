@@ -170,7 +170,7 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			EnvVar: flagEnvVarFromFlagName(flagResourcePool),
 			Usage:  "Proxmox VE Resource Pool name",
 		},
-		mcnflag.IntFlag{
+		mcnflag.StringFlag{
 			Name:   flagTemplateID,
 			EnvVar: flagEnvVarFromFlagName(flagTemplateID),
 			Usage:  "ID of the Proxmox VE template",
@@ -190,7 +190,7 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			EnvVar: flagEnvVarFromFlagName(flagSSHUser),
 			Usage:  fmt.Sprintf("SSH user created via cloud-init, defaults to '%s'", defaultSSHUser),
 		},
-		mcnflag.IntFlag{
+		mcnflag.StringFlag{
 			Name:   flagSSHPort,
 			EnvVar: flagEnvVarFromFlagName(flagSSHPort),
 			Usage:  fmt.Sprintf("SSH port, defaults to '%d'", defaultSSHPort),
@@ -230,7 +230,7 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			EnvVar: flagEnvVarFromFlagName(flagBridge),
 			Usage:  "Network bridge interface (e.g. 'vmbr0')",
 		},
-		mcnflag.IntFlag{
+		mcnflag.StringFlag{
 			Name:   flagVLAN,
 			EnvVar: flagEnvVarFromFlagName(flagVLAN),
 			Usage:  "Network VLAN tag number",
@@ -291,7 +291,16 @@ func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 	d.NodeName = opts.String(flagNode)
 	d.ResourcePoolName = opts.String(flagResourcePool)
 
-	d.TemplateID = opts.Int(flagTemplateID)
+	var err error
+
+	if tStr := opts.String(flagTemplateID); tStr != "" {
+		if d.TemplateID, err = strconv.Atoi(tStr); err != nil {
+			return fmt.Errorf("failed to parse '--%s': %w", flagTemplateID, err)
+		}
+	} else {
+		d.TemplateID = opts.Int(flagTemplateID)
+	}
+
 	if d.TemplateID <= 0 {
 		return fmt.Errorf("flag '--%s' is required and must be > 0", flagTemplateID)
 	}
@@ -311,14 +320,17 @@ func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 		d.SSHUser = defaultSSHUser
 	}
 
-	d.SSHPort = opts.Int(flagSSHPort)
+	if pStr := opts.String(flagSSHPort); pStr != "" {
+		d.SSHPort, _ = strconv.Atoi(pStr)
+	} else {
+		d.SSHPort = opts.Int(flagSSHPort)
+	}
+
 	if d.SSHPort == 0 {
 		d.SSHPort = defaultSSHPort
 	} else if d.SSHPort < 0 {
 		return fmt.Errorf("flag '--%s' must be > 0", flagSSHPort)
 	}
-
-	var err error
 
 	if d.ProcessorSockets, err = parseStringFlagToInt(opts.String(flagProcessorSockets)); err != nil {
 		return fmt.Errorf("failed to parse '--%s': %w", flagProcessorSockets, err)
@@ -360,7 +372,12 @@ func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 	d.FullClone = opts.Bool(flagFullClone)
 	d.DiskSize = opts.String(flagDiskSize)
 	d.Bridge = opts.String(flagBridge)
-	d.VLAN = opts.Int(flagVLAN)
+
+	if vStr := opts.String(flagVLAN); vStr != "" {
+		d.VLAN, _ = strconv.Atoi(vStr)
+	} else {
+		d.VLAN = opts.Int(flagVLAN)
+	}
 	d.CIPassword = opts.String(flagCIPassword)
 	d.Nameserver = opts.String(flagNameserver)
 	d.Searchdomain = opts.String(flagSearchdomain)
