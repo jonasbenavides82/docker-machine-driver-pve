@@ -119,7 +119,7 @@ func (d *Driver) getPVEClient() *proxmox.Client {
 		return d.pveClient
 	}
 
-	client := http.Client{
+	httpClient := http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
 				//nolint:gosec
@@ -134,10 +134,23 @@ func (d *Driver) getPVEClient() *proxmox.Client {
 		panic(fmt.Errorf("failed to parse Proxmox VE URL: %w", err).Error())
 	}
 
+	options := []proxmox.ClientOption{
+		proxmox.WithHTTPClient(&httpClient),
+	}
+
+	if d.TokenID != "" && d.TokenSecret != "" {
+		options = append(options, proxmox.WithAPIToken(d.TokenID, d.TokenSecret))
+	} else if d.Username != "" && d.Password != "" {
+		realm := d.Realm
+		if realm == "" {
+			realm = "pam"
+		}
+		options = append(options, proxmox.WithCredentials(d.Username, d.Password, realm))
+	}
+
 	d.pveClient = proxmox.NewClient(
 		pveURL.JoinPath("/api2/json").String(),
-		proxmox.WithAPIToken(d.TokenID, d.TokenSecret),
-		proxmox.WithHTTPClient(&client),
+		options...,
 	)
 
 	return d.pveClient

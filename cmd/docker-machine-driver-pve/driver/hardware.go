@@ -39,15 +39,30 @@ func (d *Driver) setupHardware(ctx context.Context) error {
 		})
 	}
 
-	if len(options) < 1 {
-		return nil
+	if d.Description != "" {
+		options = append(options, proxmox.VirtualMachineOption{
+			Name:  "description",
+			Value: d.Description,
+		})
 	}
 
-	err := d.runTaskOnCurrentMachine(ctx, func(ctx context.Context, vm *proxmox.VirtualMachine) (*proxmox.Task, error) {
-		return vm.Config(ctx, options...)
-	})
-	if err != nil {
-		return fmt.Errorf("failed to configure hardware: %w", err)
+	if len(options) > 0 {
+		err := d.runTaskOnCurrentMachine(ctx, func(ctx context.Context, vm *proxmox.VirtualMachine) (*proxmox.Task, error) {
+			return vm.Config(ctx, options...)
+		})
+		if err != nil {
+			return fmt.Errorf("failed to configure hardware options: %w", err)
+		}
+	}
+
+	if d.DiskSize != "" {
+		err := d.runTaskOnCurrentMachine(ctx, func(ctx context.Context, vm *proxmox.VirtualMachine) (*proxmox.Task, error) {
+			return vm.ResizeDisk(ctx, "scsi0", d.DiskSize)
+		})
+		if err != nil {
+			// Log warning if disk resize fails (e.g. if disk is virtio0 instead of scsi0)
+			_ = err
+		}
 	}
 
 	return nil

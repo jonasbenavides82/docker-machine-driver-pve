@@ -187,6 +187,12 @@ func (d *Driver) initialize() error {
 		return fmt.Errorf("failed to start the machine: %w", err)
 	}
 
+	log.Info("Waiting for QEMU Guest Agent...")
+
+	if err := d.waitForQemuAgent(context.TODO()); err != nil {
+		return fmt.Errorf("failed waiting for QEMU guest agent: %w", err)
+	}
+
 	log.Info("Waiting for cloud-init to finish...")
 
 	if err := d.waitForCloudinit(); err != nil {

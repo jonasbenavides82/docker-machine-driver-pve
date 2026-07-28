@@ -16,6 +16,10 @@ const (
 	flagInsecureTLS      = "pve-insecure-tls"
 	flagTokenID          = "pve-token-id" //nolint:gosec // False-positive
 	flagTokenSecret      = "pve-token-secret"
+	flagUsername         = "pve-username"
+	flagPassword         = "pve-password"
+	flagRealm            = "pve-realm"
+	flagNode             = "pve-node"
 	flagResourcePool     = "pve-resource-pool"
 	flagTemplateID       = "pve-template"
 	flagISODevice        = "pve-iso-device"
@@ -27,6 +31,13 @@ const (
 	flagMemory           = "pve-memory"
 	flagMemoryBalloon    = "pve-memory-balloon"
 	flagFullClone        = "pve-full-clone"
+	flagDiskSize         = "pve-disk-size"
+	flagBridge           = "pve-bridge"
+	flagVLAN             = "pve-vlan"
+	flagCIPassword       = "pve-cipassword"
+	flagNameserver       = "pve-nameserver"
+	flagSearchdomain     = "pve-searchdomain"
+	flagDescription      = "pve-description"
 	flagTags             = "pve-tags"
 )
 
@@ -49,6 +60,14 @@ type config struct {
 
 	// Proxmox VE API Token secret.
 	TokenSecret string
+
+	// Fallback credentials
+	Username string
+	Password string
+	Realm    string
+
+	// Target Proxmox node name
+	NodeName string
 
 	// Proxmox VE Resource Pool name.
 	ResourcePoolName string
@@ -78,6 +97,27 @@ type config struct {
 	// Forces full copy of all disks, even if underlying storage supports linked clones.
 	FullClone bool
 
+	// Disk size expansion or target size (e.g. 20G or +10G)
+	DiskSize string
+
+	// Network bridge (e.g. vmbr0)
+	Bridge string
+
+	// VLAN Tag
+	VLAN int
+
+	// Cloud-init user password
+	CIPassword string
+
+	// Custom DNS nameserver for cloud-init
+	Nameserver string
+
+	// Custom DNS search domain for cloud-init
+	Searchdomain string
+
+	// VM Description
+	Description string
+
 	// Tags to apply to the machine.
 	Tags []string
 }
@@ -98,12 +138,32 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 		mcnflag.StringFlag{
 			Name:   flagTokenID,
 			EnvVar: flagEnvVarFromFlagName(flagTokenID),
-			Usage:  "Proxmox VE API Token ID (including username and realm, e.g. 'root@pam!rancher')",
+			Usage:  "Proxmox VE API Token ID (e.g. 'root@pam!rancher')",
 		},
 		mcnflag.StringFlag{
 			Name:   flagTokenSecret,
 			EnvVar: flagEnvVarFromFlagName(flagTokenSecret),
 			Usage:  "Proxmox VE API Token secret",
+		},
+		mcnflag.StringFlag{
+			Name:   flagUsername,
+			EnvVar: flagEnvVarFromFlagName(flagUsername),
+			Usage:  "Proxmox VE Username (legacy auth fallback)",
+		},
+		mcnflag.StringFlag{
+			Name:   flagPassword,
+			EnvVar: flagEnvVarFromFlagName(flagPassword),
+			Usage:  "Proxmox VE Password (legacy auth fallback)",
+		},
+		mcnflag.StringFlag{
+			Name:   flagRealm,
+			EnvVar: flagEnvVarFromFlagName(flagRealm),
+			Usage:  "Proxmox VE Auth Realm (defaults to 'pam')",
+		},
+		mcnflag.StringFlag{
+			Name:   flagNode,
+			EnvVar: flagEnvVarFromFlagName(flagNode),
+			Usage:  "Proxmox VE Node name to host the VM (optional)",
 		},
 		mcnflag.StringFlag{
 			Name:   flagResourcePool,
@@ -118,47 +178,82 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 		mcnflag.StringFlag{
 			Name:   flagISODevice,
 			EnvVar: flagEnvVarFromFlagName(flagISODevice),
-			Usage:  "Bus/Device of the CD/DVD Drive to mount cloud-init ISO to (e.g. 'scsi1')",
+			Usage:  "Bus/Device of CD/DVD Drive for cloud-init ISO (e.g. 'scsi1')",
 		},
 		mcnflag.StringFlag{
 			Name:   flagNetworkInterface,
 			EnvVar: flagEnvVarFromFlagName(flagNetworkInterface),
-			Usage:  "Bus/Device of the network interface to read machine's IP address from (e.g. 'net0')",
+			Usage:  "Bus/Device of network interface (e.g. 'net0')",
 		},
 		mcnflag.StringFlag{
 			Name:   flagSSHUser,
 			EnvVar: flagEnvVarFromFlagName(flagSSHUser),
-			Usage:  fmt.Sprintf("Username for the SSH user that will be created via cloud-init, defaults to '%s'", defaultSSHUser),
+			Usage:  fmt.Sprintf("SSH user created via cloud-init, defaults to '%s'", defaultSSHUser),
 		},
 		mcnflag.IntFlag{
 			Name:   flagSSHPort,
 			EnvVar: flagEnvVarFromFlagName(flagSSHPort),
-			Usage:  fmt.Sprintf("Port to use when connecting to the machine via SSH, defaults to '%d'", defaultSSHPort),
+			Usage:  fmt.Sprintf("SSH port, defaults to '%d'", defaultSSHPort),
 		},
 		mcnflag.StringFlag{
 			Name:   flagProcessorSockets,
 			EnvVar: flagEnvVarFromFlagName(flagProcessorSockets),
-			Usage:  "If set, number of processor sockets to configure for the machine.",
+			Usage:  "Processor sockets count for the VM",
 		},
 		mcnflag.StringFlag{
 			Name:   flagProcessorCores,
 			EnvVar: flagEnvVarFromFlagName(flagProcessorCores),
-			Usage:  "If set, number of processor cores to configure for the machine.",
+			Usage:  "Processor cores count for the VM",
 		},
 		mcnflag.StringFlag{
 			Name:   flagMemory,
 			EnvVar: flagEnvVarFromFlagName(flagMemory),
-			Usage:  "If set, amount of memory in MiB to configure for the machine.",
+			Usage:  "Memory size in MiB for the VM",
 		},
 		mcnflag.StringFlag{
 			Name:   flagMemoryBalloon,
 			EnvVar: flagEnvVarFromFlagName(flagMemoryBalloon),
-			Usage:  "If set, minimum amount of memory in MiB to configure for the machine. If set to 0, disables memory ballooning.",
+			Usage:  "Minimum memory in MiB for memory ballooning (0 to disable)",
 		},
 		mcnflag.BoolFlag{
 			Name:   flagFullClone,
 			EnvVar: flagEnvVarFromFlagName(flagFullClone),
-			Usage:  "Forces full copy of all disks, even if underlying storage supports linked clones.",
+			Usage:  "Forces full copy of all disks during template clone",
+		},
+		mcnflag.StringFlag{
+			Name:   flagDiskSize,
+			EnvVar: flagEnvVarFromFlagName(flagDiskSize),
+			Usage:  "Target disk size (e.g. '20G')",
+		},
+		mcnflag.StringFlag{
+			Name:   flagBridge,
+			EnvVar: flagEnvVarFromFlagName(flagBridge),
+			Usage:  "Network bridge interface (e.g. 'vmbr0')",
+		},
+		mcnflag.IntFlag{
+			Name:   flagVLAN,
+			EnvVar: flagEnvVarFromFlagName(flagVLAN),
+			Usage:  "Network VLAN tag number",
+		},
+		mcnflag.StringFlag{
+			Name:   flagCIPassword,
+			EnvVar: flagEnvVarFromFlagName(flagCIPassword),
+			Usage:  "Cloud-init user password",
+		},
+		mcnflag.StringFlag{
+			Name:   flagNameserver,
+			EnvVar: flagEnvVarFromFlagName(flagNameserver),
+			Usage:  "Custom DNS nameserver for cloud-init",
+		},
+		mcnflag.StringFlag{
+			Name:   flagSearchdomain,
+			EnvVar: flagEnvVarFromFlagName(flagSearchdomain),
+			Usage:  "Custom DNS search domain for cloud-init",
+		},
+		mcnflag.StringFlag{
+			Name:   flagDescription,
+			EnvVar: flagEnvVarFromFlagName(flagDescription),
+			Usage:  "VM description text in Proxmox",
 		},
 		mcnflag.StringFlag{
 			Name:   flagTags,
@@ -184,15 +279,16 @@ func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 	d.InsecureTLS = opts.Bool(flagInsecureTLS)
 
 	d.TokenID = opts.String(flagTokenID)
-	if d.TokenID == "" {
-		return fmt.Errorf("flag '--%s' is required", flagTokenID)
-	}
-
 	d.TokenSecret = opts.String(flagTokenSecret)
-	if d.TokenSecret == "" {
-		return fmt.Errorf("flag '--%s' is required", flagTokenSecret)
+	d.Username = opts.String(flagUsername)
+	d.Password = opts.String(flagPassword)
+	d.Realm = opts.String(flagRealm)
+
+	if d.TokenID == "" && (d.Username == "" || d.Password == "") {
+		return fmt.Errorf("either API token ('--%s' & '--%s') or credentials ('--%s' & '--%s') are required", flagTokenID, flagTokenSecret, flagUsername, flagPassword)
 	}
 
+	d.NodeName = opts.String(flagNode)
 	d.ResourcePoolName = opts.String(flagResourcePool)
 	if d.ResourcePoolName == "" {
 		return fmt.Errorf("flag '--%s' is required", flagResourcePool)
@@ -200,7 +296,7 @@ func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 
 	d.TemplateID = opts.Int(flagTemplateID)
 	if d.TemplateID <= 0 {
-		return fmt.Errorf("flag '--%s' is required and must be >= 0", flagTemplateID)
+		return fmt.Errorf("flag '--%s' is required and must be > 0", flagTemplateID)
 	}
 
 	d.ISODeviceName = strings.ToLower(opts.String(flagISODevice))
@@ -251,7 +347,7 @@ func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 		return fmt.Errorf("flag '--%s' must be >= 1; set to 0 to disable", flagMemoryBalloon)
 	}
 
-	// Default memory/memory ballon to the other one if it's set
+	// Default memory/memory balloon to the other one if it's set
 	if d.Memory != nil && d.MemoryBalloon == nil {
 		d.MemoryBalloon = d.Memory
 	}
@@ -260,14 +356,22 @@ func (d *Driver) SetConfigFromFlags(opts drivers.DriverOptions) error {
 		d.Memory = d.MemoryBalloon
 	}
 
-	// Balloon target can not be higher than total memory.
 	if d.Memory != nil && d.MemoryBalloon != nil && *d.MemoryBalloon > *d.Memory {
 		return fmt.Errorf("flag '--%s' must be <= than flag '--%s'", flagMemoryBalloon, flagMemory)
 	}
 
 	d.FullClone = opts.Bool(flagFullClone)
+	d.DiskSize = opts.String(flagDiskSize)
+	d.Bridge = opts.String(flagBridge)
+	d.VLAN = opts.Int(flagVLAN)
+	d.CIPassword = opts.String(flagCIPassword)
+	d.Nameserver = opts.String(flagNameserver)
+	d.Searchdomain = opts.String(flagSearchdomain)
+	d.Description = opts.String(flagDescription)
 
-	d.Tags = strings.Split(opts.String(flagTags), ",")
+	if opts.String(flagTags) != "" {
+		d.Tags = strings.Split(opts.String(flagTags), ",")
+	}
 
 	return nil
 }
