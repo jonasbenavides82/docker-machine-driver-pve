@@ -136,14 +136,16 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Usage:  "Proxmox VE URL (alias)",
 			Value:  "",
 		},
-		mcnflag.BoolFlag{
+		mcnflag.StringFlag{
 			Name:   flagInsecureTLS,
 			EnvVar: flagEnvVarFromFlagName(flagInsecureTLS),
 			Usage:  "Disables Proxmox VE TLS certificate verification",
+			Value:  "",
 		},
-		mcnflag.BoolFlag{
+		mcnflag.StringFlag{
 			Name:   "insecure-tls",
 			Usage:  "Disables Proxmox VE TLS certificate verification (alias)",
+			Value:  "",
 		},
 		mcnflag.StringFlag{
 			Name:   flagTokenID,
@@ -368,14 +370,16 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Usage:  "Minimum memory in MiB (alias)",
 			Value:  "0",
 		},
-		mcnflag.BoolFlag{
+		mcnflag.StringFlag{
 			Name:   flagFullClone,
 			EnvVar: flagEnvVarFromFlagName(flagFullClone),
 			Usage:  "Forces full copy of all disks during template clone",
+			Value:  "",
 		},
-		mcnflag.BoolFlag{
+		mcnflag.StringFlag{
 			Name:   "full-clone",
 			Usage:  "Forces full copy of all disks during template clone (alias)",
+			Value:  "",
 		},
 		mcnflag.StringFlag{
 			Name:   flagDiskSize,
